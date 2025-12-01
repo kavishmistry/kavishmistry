@@ -1,363 +1,473 @@
 import React, { useState } from "react";
 
-/*
-Kavish's Engineering Portfolio (React + Tailwind)
-Cleaned, validated, fully working version for Vite + Cloudflare Pages
-*/
-
-// ---------- DATA ----------
-
-const projectsData = [
-  {
-    title: "WRF Wind–Rainfall Lead/Lag Analysis",
-    tags: ["Python", "xarray", "WRF", "HPC", "Signal Processing"],
-    blurb:
-      "Cross-correlation and time-offset quantification between windspeed and precipitation during the Mumbai 2005 EHRE using WRF d04.",
-    links: [
-      { label: "Code", href: "#" },
-      { label: "Tech Note", href: "#" },
-    ],
-  },
-  {
-    title: "Robot Hand v2 — Adaptive Grip",
-    tags: ["CAD", "Control", "Servo", "PID", "Manufacturing"],
-    blurb:
-      "Upgraded end-effector with compliant finger pads, feed-forward torque, and parameterized Fusion 360 design for rapid iteration.",
-    links: [
-      { label: "Demo", href: "#" },
-      { label: "CAD", href: "#" },
-    ],
-  },
-  {
-    title: "Crank Arm Fatigue Life Model",
-    tags: ["MATLAB", "FEA", "Materials", "S-N Curves"],
-    blurb:
-      "Stress amplitude extraction and life prediction under cyclic loads; compares Goodman vs. Gerber corrections with safety factors.",
-    links: [
-      { label: "Report", href: "#" },
-      { label: "Figures", href: "#" },
-    ],
-  },
+const navItems = [
+  { id: "about", label: "About" },
+  { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
+  { id: "skills", label: "Skills" },
+  { id: "contact", label: "Contact" },
 ];
 
-const skills = {
-  Core: ["SolidWorks", "MATLAB", "Python", "Git", "Linux (shell)", "LaTeX"],
-  "Data/Modeling": ["xarray", "NumPy", "SciPy", "pandas", "Matplotlib", "wrf-python"],
-  Simulation: ["WRF", "SLURM", "FEA basics", "CAD→CAM"],
-  Hardware: ["3-axis CNC", "3D printing", "Soldering", "Oscilloscope"],
-};
-
-// ---------- REUSABLE COMPONENTS ----------
-
 const Section = ({ id, title, children }) => (
-  <section id={id} className="scroll-mt-24 py-14 md:py-20">
-    <div className="max-w-6xl mx-auto px-5">
-      {title && (
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6 md:mb-8">
-          {title}
-        </h2>
-      )}
-      {children}
-    </div>
+  <section
+    id={id}
+    className="scroll-mt-24 max-w-5xl mx-auto px-4 py-16 lg:py-20"
+  >
+    <h2 className="text-3xl font-semibold tracking-tight mb-6">{title}</h2>
+    {children}
   </section>
 );
 
-const Pill = ({ children }) => (
-  <span className="inline-flex items-center text-xs md:text-sm border rounded-full px-3 py-1 mr-2 mb-2">
+const Tag = ({ children }) => (
+  <span className="inline-flex items-center rounded-full border border-slate-300 dark:border-slate-600 px-3 py-1 text-xs font-medium">
     {children}
   </span>
 );
 
 const Card = ({ children }) => (
-  <div className="group border rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-all duration-300 bg-white/60 dark:bg-zinc-900/60 backdrop-blur">
+  <div className="rounded-2xl border border-slate-200/70 dark:border-slate-700/70 p-5 md:p-6 shadow-sm bg-white/70 dark:bg-slate-900/70 backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
     {children}
   </div>
 );
 
-// ---------- NAV ----------
+function App() {
+  const [darkMode, setDarkMode] = useState(true);
 
-const Nav = () => (
-  <header className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/60 bg-white/80 dark:bg-zinc-900/70 border-b">
-    <div className="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">
-      <a href="#home" className="font-bold tracking-tight">
-        Kavish Mistry
-      </a>
-      <nav className="hidden md:flex gap-6 text-sm">
-        {[
-          ["Projects", "#projects"],
-          ["Skills", "#skills"],
-          ["Experience", "#experience"],
-          ["Writing", "#writing"],
-          ["Contact", "#contact"],
-        ].map(([label, href]) => (
-          <a key={label} href={href} className="opacity-80 hover:opacity-100">
-            {label}
-          </a>
-        ))}
-      </nav>
-      <a href="#resume" className="text-sm border rounded-full px-3 py-1 hover:shadow">
-        Résumé
-      </a>
-    </div>
-  </header>
-);
-
-// ---------- HERO ----------
-
-const Hero = () => (
-  <div className="relative overflow-hidden">
-    <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-300 via-transparent to-transparent opacity-40 dark:from-blue-800" />
-    <Section id="home" title="">
-      <div className="grid md:grid-cols-12 gap-8 items-center">
-        <div className="md:col-span-7">
-          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight tracking-tight">
-            Building reliable systems—
-            <span className="text-blue-600"> from simulations to hardware</span>
-          </h1>
-
-          <p className="mt-5 text-base md:text-lg opacity-90 max-w-2xl">
-            Mechanical Engineering @ UIUC • climate-energy research (WRF + ERA5) • robotics & manufacturing.
-            Turning messy signals into crisp decisions and CAD into parts that fit first try.
-          </p>
-
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a href="#projects" className="border rounded-full px-4 py-2 text-sm hover:shadow">
-              See projects
-            </a>
-            <a
-              href="#contact"
-              className="rounded-full px-4 py-2 text-sm bg-blue-600 text-white hover:opacity-90"
-            >
-              Get in touch
-            </a>
-          </div>
-
-          <div className="mt-6 flex flex-wrap">
-            {["WRF", "SLURM", "xarray", "SolidWorks", "MATLAB", "Python"].map((t) => (
-              <Pill key={t}>{t}</Pill>
-            ))}
-          </div>
-        </div>
-
-        <div className="md:col-span-5">
-          <Card>
-            <h3 className="font-semibold text-lg mb-2">Latest Build</h3>
-            <p className="text-sm opacity-90">
-              Mumbai 2005 EHRE: wind–rainfall lead/lag mapping at 100 m hub height (19.11°N, 72.85°E).  
-              Extracted with <code className="mx-1">xarray</code> and visualized in{" "}
-              <code className="mx-1">matplotlib</code>.
-            </p>
-
-            <div className="mt-4 h-40 w-full rounded-xl bg-gradient-to-br from-zinc-200 to-zinc-50 dark:from-zinc-800 dark:to-zinc-900 grid place-items-center text-xs opacity-80">
-              Placeholder: hero graphic or plot
-            </div>
-          </Card>
-        </div>
-      </div>
-    </Section>
-  </div>
-);
-
-// ---------- PROJECTS ----------
-
-const Projects = () => (
-  <Section id="projects" title="Featured Projects">
-    <div className="grid md:grid-cols-3 gap-6">
-      {projectsData.map((p) => (
-        <Card key={p.title}>
-          <h3 className="text-lg font-semibold">{p.title}</h3>
-          <p className="mt-2 text-sm opacity-90">{p.blurb}</p>
-
-          <div className="mt-3 flex flex-wrap">
-            {p.tags.map((t) => (
-              <Pill key={t}>{t}</Pill>
-            ))}
-          </div>
-
-          <div className="mt-4 flex gap-3 text-sm">
-            {p.links.map((l) => (
-              <a key={l.label} href={l.href} className="underline underline-offset-4">
-                {l.label}
-              </a>
-            ))}
-          </div>
-        </Card>
-      ))}
-    </div>
-  </Section>
-);
-
-// ---------- SKILLS ----------
-
-const Skills = () => (
-  <Section id="skills" title="Skills & Tools">
-    <div className="grid md:grid-cols-2 gap-6">
-      {Object.entries(skills).map(([cat, items]) => (
-        <Card key={cat}>
-          <h3 className="font-semibold mb-2">{cat}</h3>
-          <div className="flex flex-wrap">
-            {items.map((s) => (
-              <Pill key={s}>{s}</Pill>
-            ))}
-          </div>
-        </Card>
-      ))}
-
-      <Card>
-        <h3 className="font-semibold mb-2">Interests</h3>
-        <p className="text-sm opacity-90">
-          Renewable-energy complementarity • controls • mechatronics • design for manufacturability • HPC for environmental modeling.
-        </p>
-      </Card>
-
-      <Card>
-        <h3 className="font-semibold mb-2">What I’m Learning Next</h3>
-        <ul className="list-disc pl-5 text-sm opacity-90 space-y-1">
-          <li>Advanced SolidWorks surfacing & design tables</li>
-          <li>MATLAB/Simulink control design</li>
-          <li>CFD basics for rotating machinery</li>
-        </ul>
-      </Card>
-    </div>
-  </Section>
-);
-
-// ---------- EXPERIENCE ----------
-
-const Experience = () => (
-  <Section id="experience" title="Experience">
-    <div className="space-y-4">
-      {[
-        {
-          role: "Research Intern — Monsoon Lab (IIT Bombay)",
-          time: "Summer–Fall 2025",
-          bullets: [
-            "Ran 4-domain WRF simulations; automated post-processing with xarray and wrf-python.",
-            "Computed wind energy metrics at 100 m; built lead/lag analyses vs rainfall.",
-            "Used SLURM on HPC; profiled jobs and optimized IO.",
-          ],
-        },
-        {
-          role: "Student Teams — IRS / EMS / MakerWorks",
-          time: "Ongoing",
-          bullets: [
-            "Drivetrain & manufacturing tasks; CAD→CAM; tolerancing; fast iteration.",
-            "Electromechanical prototyping; documentation, testing, iteration.",
-          ],
-        },
-      ].map((e) => (
-        <Card key={e.role}>
-          <div className="flex items-baseline justify-between gap-4">
-            <h3 className="text-lg font-semibold">{e.role}</h3>
-            <span className="text-sm opacity-70">{e.time}</span>
-          </div>
-
-          <ul className="mt-3 list-disc pl-5 text-sm opacity-90 space-y-1">
-            {e.bullets.map((b, i) => (
-              <li key={i}>{b}</li>
-            ))}
-          </ul>
-        </Card>
-      ))}
-    </div>
-  </Section>
-);
-
-// ---------- WRITING ----------
-
-const Writing = () => (
-  <Section id="writing" title="Writing & Notes">
-    <div className="grid md:grid-cols-2 gap-6">
-      <Card>
-        <h3 className="font-semibold">Crank Arm: Fatigue Life Study</h3>
-        <p className="text-sm opacity-90 mt-2">
-          15–18 page analysis of cyclic fatigue, S-N vs ε-N models, and design tradeoffs.
-        </p>
-        <a href="#" className="text-sm underline underline-offset-4 mt-3 inline-block">
-          Read summary
-        </a>
-      </Card>
-
-      <Card>
-        <h3 className="font-semibold">WRF Post-Processing Cookbook</h3>
-        <p className="text-sm opacity-90 mt-2">
-          A reference for extracting wind & rainfall at (19.11°N, 72.85°E), computing hub-height wind, and generating lead/lag maps.
-        </p>
-        <a href="#" className="text-sm underline underline-offset-4 mt-3 inline-block">
-          Read notes
-        </a>
-      </Card>
-    </div>
-  </Section>
-);
-
-// ---------- FOOTER ----------
-
-const Footer = () => (
-  <footer className="border-t py-10">
-    <div className="max-w-6xl mx-auto px-5 text-sm flex flex-col md:flex-row items-center justify-between gap-4">
-      <span>© {new Date().getFullYear()} Kavish Mistry</span>
-      <div className="flex gap-4">
-        <a href="#" className="underline underline-offset-4">GitHub</a>
-        <a href="#" className="underline underline-offset-4">LinkedIn</a>
-        <a href="mailto:kavish@example.com" className="underline underline-offset-4">Email</a>
-      </div>
-    </div>
-  </footer>
-);
-
-// ---------- MAIN APP ----------
-
-export default function App() {
-  const [theme, setTheme] = useState("light");
-  const toggle = () => setTheme((t) => (t === "light" ? "dark" : "light"));
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   return (
-    <div className={theme === "dark" ? "dark" : ""}>
-      <div className="min-h-screen text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-950">
+    <div className={darkMode ? "dark scroll-smooth" : "scroll-smooth"}>
+      <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+        {/* NAVBAR */}
+        <header className="sticky top-0 z-30 border-b border-slate-200/70 dark:border-slate-800/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur">
+          <nav className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
+            <button
+              onClick={() => scrollToSection("top")}
+              className="font-semibold tracking-tight text-sm md:text-base hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+            >
+              Kavish <span className="text-sky-600 dark:text-sky-400">Mistry</span>
+            </button>
 
-        <Nav />
+            <div className="hidden md:flex items-center gap-6 text-sm">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className="hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
 
-        <main>
-          <Hero />
-          <Projects />
-          <Skills />
-          <Experience />
-          <Writing />
+              {/* Dark mode toggle */}
+              <button
+                onClick={() => setDarkMode((prev) => !prev)}
+                className="ml-4 inline-flex items-center rounded-full border border-slate-300 dark:border-slate-600 px-3 py-1.5 text-xs font-medium hover:border-sky-500 dark:hover:border-sky-400 hover:text-sky-500 dark:hover:text-sky-400 transition-all"
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? "☾ Dark" : "☀ Light"}
+              </button>
+            </div>
 
-          <Section id="resume" title="Résumé">
-            <Card>
-              <p className="text-sm opacity-90">
-                Drop a PDF in <code>public/</code> and link it here. Example:
-                <a className="underline ml-1" href="/Kavish_Mistry_Resume.pdf">
-                  /Kavish_Mistry_Resume.pdf
-                </a>
+            {/* Mobile toggle only */}
+            <button
+              onClick={() => setDarkMode((prev) => !prev)}
+              className="md:hidden inline-flex items-center rounded-full border border-slate-300 dark:border-slate-600 px-3 py-1 text-xs font-medium hover:border-sky-500 dark:hover:border-sky-400 hover:text-sky-500 dark:hover:text-sky-400 transition-all"
+            >
+              {darkMode ? "☾" : "☀"}
+            </button>
+          </nav>
+        </header>
+
+        <main id="top">
+          {/* HERO */}
+          <section className="max-w-5xl mx-auto px-4 pt-12 pb-8 lg:pt-20 lg:pb-12">
+            <div className="grid gap-10 md:grid-cols-[2fr,1.2fr] items-center">
+              <div className="space-y-4">
+                <p className="text-sm uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+                  Mechanical Engineering @ UIUC
+                </p>
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+                  I design, simulate, and{" "}
+                  <span className="text-sky-600 dark:text-sky-400">
+                    build engineering systems.
+                  </span>
+                </h1>
+                <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 max-w-xl">
+                  I&apos;m a Mechanical Engineering student at the University of
+                  Illinois Urbana–Champaign (GPA 3.74), combining{" "}
+                  <span className="font-medium">simulation, data analysis</span> and{" "}
+                  <span className="font-medium">hands-on mechanical design</span>.
+                  My experience spans WRF-based climate research, robotics, and
+                  manufacturing-focused projects.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Tag>WRF &amp; climate modelling</Tag>
+                  <Tag>Mechanical design</Tag>
+                  <Tag>Python &amp; MATLAB</Tag>
+                  <Tag>Thermal / fluids</Tag>
+                </div>
+                <div className="flex flex-wrap gap-3 pt-1">
+                  <button
+                    onClick={() => scrollToSection("projects")}
+                    className="inline-flex items-center rounded-full bg-sky-600 dark:bg-sky-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-sky-500 dark:hover:bg-sky-400 transition-colors"
+                  >
+                    View projects
+                  </button>
+                  <button
+                    onClick={() => scrollToSection("contact")}
+                    className="inline-flex items-center rounded-full border border-slate-300 dark:border-slate-600 px-5 py-2.5 text-sm font-medium hover:border-sky-500 dark:hover:border-sky-400 hover:text-sky-500 dark:hover:text-sky-400 transition-colors"
+                  >
+                    Get in touch
+                  </button>
+                </div>
+              </div>
+
+              {/* Sidebar summary */}
+              <div className="space-y-4">
+                <Card>
+                  <h3 className="text-sm font-semibold mb-2">Snapshot</h3>
+                  <ul className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                    <li>
+                      🎓 B.S. Mechanical Engineering,{" "}
+                      <span className="font-medium">
+                        University of Illinois Urbana–Champaign
+                      </span>{" "}
+                      (2024–2028)
+                    </li>
+                    <li>📍 Based in USA · originally from Mumbai, India</li>
+                    <li>
+                      🌧️ Research Intern at IIT Bombay, analysing extreme rainfall &
+                      renewable energy
+                    </li>
+                    <li>🚀 Involved in robotics and space settlement design</li>
+                  </ul>
+                </Card>
+                <Card>
+                  <h3 className="text-sm font-semibold mb-2">Currently</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">
+                    Working on WRF-based climate and renewable energy research at
+                    IIT Bombay, developing mechanical and data-driven intuition for
+                    extreme weather, while building experience in robotics, CAD, and
+                    design for manufacturing.
+                  </p>
+                </Card>
+              </div>
+            </div>
+          </section>
+
+          {/* ABOUT */}
+          <Section id="about" title="About">
+            <div className="space-y-4 text-sm md:text-base text-slate-700 dark:text-slate-200">
+              <p>
+                I&apos;m Kavish, a Mechanical Engineering student interested in how{" "}
+                <span className="font-medium">mechanical systems</span> behave in the
+                real world—under load, under uncertainty, and under extreme
+                environmental conditions. I enjoy connecting{" "}
+                <span className="font-medium">first-principles physics</span> with{" "}
+                <span className="font-medium">computational tools</span> like WRF,
+                Python, and MATLAB.
               </p>
-            </Card>
+              <p>
+                My recent work as a Research Intern at{" "}
+                <span className="font-medium">IIT Bombay</span> focuses on the impact
+                of extreme rainfall on renewable energy generation using ERA5
+                reanalysis data, xarray, and WRF modelling on HPC clusters.
+              </p>
+              <p>
+                Outside of research, I&apos;ve worked with combustion engines at a
+                bike workshop, contributed to an international space settlement
+                competition, and helped design rover drivetrain components for a
+                Lunabotics team.
+              </p>
+            </div>
           </Section>
 
+          {/* EXPERIENCE */}
+          <Section id="experience" title="Experience">
+            <div className="grid gap-4 md:gap-5">
+              {/* IIT Bombay */}
+              <Card>
+                <div className="flex justify-between gap-2 mb-1">
+                  <h3 className="text-sm md:text-base font-semibold">
+                    Research Intern · Indian Institute of Technology Bombay
+                  </h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    June 2025 – Present · Mumbai, India
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  Extreme rainfall &amp; renewable energy · Python · xarray · WRF · HPC
+                </p>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5">
+                  <li>
+                    • Analysed the impact of extreme rainfall on renewable energy
+                    generation using ERA5 reanalysis datasets.
+                  </li>
+                  <li>
+                    • Processed and visualised NetCDF climate data with Python,
+                    focusing on wind speed patterns during monsoon events.
+                  </li>
+                  <li>
+                    • Processed 35+ years of ERA5 NetCDF datasets using xarray and
+                    wrf-python and executed parallel WRF simulations on HPC clusters
+                    with SLURM.
+                  </li>
+                  <li>
+                    • Applied analytical modelling to study wind loading and mechanical
+                    performance under extreme weather.
+                  </li>
+                </ul>
+              </Card>
+
+              {/* Zero2One */}
+              <Card>
+                <div className="flex justify-between gap-2 mb-1">
+                  <h3 className="text-sm md:text-base font-semibold">
+                    Fall Cohort Member · Zero2One
+                  </h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Sept 2024 – Dec 2024 · Urbana, IL
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  Startup models · Investment strategy · Presentation skills
+                </p>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5">
+                  <li>
+                    • Analysed startup business models and investment strategies as part
+                    of a 10-week cohort.
+                  </li>
+                  <li>
+                    • Developed presentation, evaluation, and discussion skills through
+                    peer-led sessions.
+                  </li>
+                </ul>
+              </Card>
+
+              {/* Biker's Pad */}
+              <Card>
+                <div className="flex justify-between gap-2 mb-1">
+                  <h3 className="text-sm md:text-base font-semibold">
+                    Trainee · Biker&apos;s Pad
+                  </h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    July 2023 · Mumbai, India
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  Drivetrain &amp; engine mechanics · Hands-on diagnostics
+                </p>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5">
+                  <li>
+                    • Collaborated with engineers to repair and analyse bike engines,
+                    including drive chains, fuel, and exhaust systems.
+                  </li>
+                  <li>
+                    • Assisted in diagnosing inefficiencies using mechanical disassembly
+                    and component inspection.
+                  </li>
+                  <li>
+                    • Gained exposure to drivetrain mechanics, combustion performance,
+                    fuel–air optimisation, and gear ratio selection.
+                  </li>
+                </ul>
+              </Card>
+
+              {/* ENSO */}
+              <Card>
+                <div className="flex justify-between gap-2 mb-1">
+                  <h3 className="text-sm md:text-base font-semibold">
+                    Intern · ENSO Wealth Tech
+                  </h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    May 2022 – June 2022 · Mumbai, India
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  Front-end layouts · Market research · Product design
+                </p>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5">
+                  <li>
+                    • Developed front-end layouts with HTML/CSS to support product
+                    development.
+                  </li>
+                  <li>
+                    • Conducted market research and contributed to marketing efforts to
+                    streamline product design decisions.
+                  </li>
+                </ul>
+              </Card>
+            </div>
+          </Section>
+
+          {/* PROJECTS & ACTIVITIES */}
+          <Section id="projects" title="Projects & Activities">
+            <div className="grid gap-5 md:grid-cols-2">
+              {/* Space Settlement */}
+              <Card>
+                <h3 className="text-sm md:text-base font-semibold mb-1">
+                  Space Settlement Design Competition · Team Ignite
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  Interim Head – Operations · Dec 2022 – Apr 2024
+                </p>
+                <p className="text-xs text-slate-700 dark:text-slate-200 mb-3">
+                  Member and Interim Head of Operations for Team Ignite in the
+                  International Space Settlement Design Competition, simulating the
+                  operations of an aerospace company to design a space settlement for
+                  future human habitation.
+                </p>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5 mb-3">
+                  <li>
+                    • Contributed to jigs, fixtures, energy production, docking
+                    mechanisms, fire prevention, and internal transport design.
+                  </li>
+                  <li>
+                    • Integrated structural design, life support, automation, power
+                    generation, and human factors into a unified proposal.
+                  </li>
+                  <li>
+                    • Collaborated under tight deadlines to deliver and present a
+                    detailed proposal to industry professionals.
+                  </li>
+                </ul>
+                <div className="flex flex-wrap gap-2 text-[0.7rem]">
+                  <Tag>Systems thinking</Tag>
+                  <Tag>Operations</Tag>
+                  <Tag>Team leadership</Tag>
+                </div>
+              </Card>
+
+              {/* Lunabotics */}
+              <Card>
+                <h3 className="text-sm md:text-base font-semibold mb-1">
+                  Illinois Robotics In Space (Lunabotics)
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                  Mechanical Member – Drivetrain · Sept 2025 – Present
+                </p>
+                <p className="text-xs text-slate-700 dark:text-slate-200 mb-3">
+                  Mechanical team member focusing on rover drivetrain design and
+                  mechanical integration for a Lunabotics-style rover project.
+                </p>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5 mb-3">
+                  <li>
+                    • Designed and developed mechanical components to support rover
+                    mobility and load-bearing requirements.
+                  </li>
+                  <li>
+                    • Created and refined CAD models to support fabrication and
+                    assembly workflows.
+                  </li>
+                  <li>
+                    • Collaborated in design reviews and integration with other
+                    subsystems.
+                  </li>
+                </ul>
+                <div className="flex flex-wrap gap-2 text-[0.7rem]">
+                  <Tag>Drivetrain</Tag>
+                  <Tag>CAD</Tag>
+                  <Tag>Robotics</Tag>
+                </div>
+              </Card>
+            </div>
+          </Section>
+
+          {/* SKILLS */}
+          <Section id="skills" title="Skills & Coursework">
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <h3 className="text-sm font-semibold mb-3">Technical Skills</h3>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5">
+                  <li>
+                    <span className="font-medium">CAD:</span> Fusion 360, SolidWorks
+                    (in progress), basic PTC Creo (in progress), engineering drawings,
+                    GD&amp;T.
+                  </li>
+                  <li>
+                    <span className="font-medium">Mechanical Engineering:</span>{" "}
+                    Mechanical design, prototyping &amp; assembly, tolerance/fit
+                    analysis, manufacturing processes.
+                  </li>
+                  <li>
+                    <span className="font-medium">Computation:</span> Python, MATLAB,
+                    HPC (SLURM), WRF modelling, data analysis, NetCDF/xarray.
+                  </li>
+                  <li>
+                    <span className="font-medium">Languages:</span> English, Hindi,
+                    Gujarati.
+                  </li>
+                </ul>
+              </Card>
+              <Card>
+                <h3 className="text-sm font-semibold mb-3">Relevant Coursework</h3>
+                <ul className="text-xs text-slate-700 dark:text-slate-200 space-y-1.5">
+                  <li>• CAD &amp; Design for Manufacturing</li>
+                  <li>• Thermodynamics</li>
+                  <li>• Statics &amp; Dynamics</li>
+                  <li>• Solid Mechanics</li>
+                  <li>• Differential Equations</li>
+                  <li>• Linear Algebra</li>
+                </ul>
+              </Card>
+            </div>
+          </Section>
+
+          {/* CONTACT */}
           <Section id="contact" title="Contact">
-            <Card>
-              <p className="text-sm opacity-90">
-                Email: kavish@example.com • Open to research and internship opportunities in robotics,
-                manufacturing, and climate-energy modeling.
+            <div className="max-w-xl space-y-4 text-sm md:text-base text-slate-700 dark:text-slate-200">
+              <p>
+                I&apos;m actively building my portfolio and preparing for{" "}
+                <span className="font-medium">
+                  future mechanical / hardware internships
+                </span>{" "}
+                in areas like thermal &amp; fluid systems, energy, simulation, and
+                robotics.
               </p>
-            </Card>
+              <p>
+                If you&apos;d like to chat about internships, projects, or research:
+              </p>
+              <ul className="space-y-1.5 text-sm">
+                <li>
+                  ✉️ Email:{" "}
+                  <a
+                    href="mailto:kavishm2@illinois.edu"
+                    className="text-sky-500 dark:text-sky-400 hover:underline"
+                  >
+                    kavishm2@illinois.edu
+                  </a>
+                </li>
+                <li>
+                  💼 LinkedIn:{" "}
+                  <a
+                    href="https://www.linkedin.com/in/kavishjmistry"
+                    className="text-sky-500 dark:text-sky-400 hover:underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    linkedin.com/in/kavishjmistry
+                  </a>
+                </li>
+              </ul>
+            </div>
           </Section>
+
+          <footer className="border-t border-slate-200/70 dark:border-slate-800/80 mt-10">
+            <div className="max-w-5xl mx-auto px-4 py-6 text-xs text-slate-500 dark:text-slate-400 flex justify-between">
+              <span>© {new Date().getFullYear()} Kavish Mistry</span>
+              <span>Built with React &amp; Tailwind CSS</span>
+            </div>
+          </footer>
         </main>
-
-        <Footer />
-
-        <button
-          onClick={toggle}
-          className="fixed bottom-5 right-5 rounded-full px-4 py-2 border shadow bg-white/70 dark:bg-zinc-900/70 backdrop-blur"
-          aria-label="Toggle theme"
-        >
-          Toggle {theme === "light" ? "Dark" : "Light"}
-        </button>
-
       </div>
     </div>
   );
 }
 
+export default App;
